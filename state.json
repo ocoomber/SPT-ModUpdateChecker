@@ -1,0 +1,168 @@
+{
+  "sptVersion": null,
+  "mods": {
+    "236": {
+      "version": "2.1.2",
+      "name": "Server Value Modifier [SVM]",
+      "url": "https://forge.sp-tarkov.com/mod/236/server-value-modifier-svm",
+      "updatedAt": "2026-05-20T12:08:00.000000Z"
+    },
+    "791": {
+      "version": "4.4.3",
+      "name": "SAIN - Solarint's AI Modifications - Full AI Combat System Replacement",
+      "url": "https://forge.sp-tarkov.com/mod/791/sain-solarints-ai-modifications-full-ai-combat-system-replacement",
+      "updatedAt": "2026-04-23T23:46:00.000000Z"
+    },
+    "827": {
+      "version": "1.8.2",
+      "name": "Waypoints - Expanded Navmesh",
+      "url": "https://forge.sp-tarkov.com/mod/827/waypoints-expanded-navmesh",
+      "updatedAt": "2026-04-05T17:23:00.000000Z"
+    },
+    "861": {
+      "version": "2.2.0",
+      "name": "MoreCheckmarks",
+      "url": "https://forge.sp-tarkov.com/mod/861/morecheckmarks",
+      "updatedAt": "2026-06-27T21:40:00.000000Z"
+    },
+    "902": {
+      "version": "1.4.0",
+      "name": "BigBrain",
+      "url": "https://forge.sp-tarkov.com/mod/902/bigbrain",
+      "updatedAt": "2025-10-11T19:30:03.000000Z"
+    },
+    "1249": {
+      "version": "1.0.5",
+      "name": "Exfil Flare Notification",
+      "url": "https://forge.sp-tarkov.com/mod/1249/exfil-flare-notification",
+      "updatedAt": "2026-02-11T00:55:00.000000Z"
+    },
+    "1342": {
+      "version": "5.3.11",
+      "name": "UI Fixes",
+      "url": "https://forge.sp-tarkov.com/mod/1342/ui-fixes",
+      "updatedAt": "2026-07-11T17:01:00.000000Z"
+    },
+    "1343": {
+      "version": "1.1.4",
+      "name": "Skipper",
+      "url": "https://forge.sp-tarkov.com/mod/1343/skipper",
+      "updatedAt": "2025-10-23T00:08:00.000000Z"
+    },
+    "1431": {
+      "version": "1.1.3",
+      "name": "Dynamic Maps",
+      "url": "https://forge.sp-tarkov.com/mod/1431/dynamic-maps",
+      "updatedAt": "2026-04-20T02:50:00.000000Z"
+    },
+    "1479": {
+      "version": "1.3.0",
+      "name": "Raid Review",
+      "url": "https://forge.sp-tarkov.com/mod/1479/raid-review",
+      "updatedAt": "2026-06-30T20:56:00.000000Z"
+    },
+    "2003": {
+      "version": "1.8.4",
+      "name": "HollywoodFX",
+      "url": "https://forge.sp-tarkov.com/mod/2003/hollywoodfx",
+      "updatedAt": "2026-02-12T22:23:00.000000Z"
+    },
+    "2046": {
+      "version": "1.4.0",
+      "name": "PAUSE",
+      "url": "https://forge.sp-tarkov.com/mod/2046/pause",
+      "updatedAt": "2025-10-18T04:00:00.000000Z"
+    },
+    "2076": {
+      "version": "2.0.2",
+      "name": "Hideout In Progress",
+      "url": "https://forge.sp-tarkov.com/mod/2076/hideout-in-progress",
+      "updatedAt": "2025-12-27T17:33:00.000000Z"
+    },
+    "2097": {
+      "version": "2.0.19",
+      "name": "ABPS - Acid's Bot Placement System",
+      "url": "https://forge.sp-tarkov.com/mod/2097/abps-acids-bot-placement-system",
+      "updatedAt": "2026-06-13T16:51:00.000000Z"
+    },
+    "2299": {
+      "version": "2.7.0",
+      "name": "Show Me The Money (Item Pricing)",
+      "url": "https://forge.sp-tarkov.com/mod/2299/show-me-the-money-item-pricing",
+      "updatedAt": "2026-02-02T18:01:00.000000Z"
+    },
+    "2391": {
+      "version": "1.0.2",
+      "name": "Fair Bot Health",
+      "url": "https://forge.sp-tarkov.com/mod/2391/fair-bot-health",
+      "updatedAt": "2025-10-23T15:29:00.000000Z"
+    },
+    "2706": {
+      "version": "1.2.1",
+      "name": "ORBIT",
+      "url": "https://forge.sp-tarkov.com/mod/2706/orbit",
+      "updatedAt": "2026-07-02T20:39:00.000000Z"
+    },
+    "2787": {
+      "version": "1.0.1",
+      "name": "Close Menu On Damage",
+      "url": "https://forge.sp-tarkov.com/mod/2787/close-menu-on-damage",
+      "updatedAt": "2026-06-29T20:20:00.000000Z"
+    },
+    "2804": {
+      "version": "1.0.0",
+      "name": "BetterLoadouts",
+      "url": "https://forge.sp-tarkov.com/mod/2804/betterloadouts",
+      "updatedAt": "2026-07-07T02:30:00.000000Z"
+    },
+    "a_32": {
+      "version": "1.0.0",
+      "name": "Harmony's Hardcore Rules",
+      "url": "https://forge.sp-tarkov.com/addon/32/harmonys-hardcore-rules",
+      "updatedAt": "2026-02-17T18:49:00.000000Z",
+      "parentModId": 236
+    },
+    "a_79": {
+      "version": "1.0.0",
+      "name": "Baconism's Unrepentant Bots (SAIN Preset)",
+      "url": "https://forge.sp-tarkov.com/addon/79/baconisms-unrepentant-bots-sain-preset",
+      "updatedAt": "2026-06-17T10:00:00.000000Z",
+      "parentModId": 791
+    },
+    "a_26": {
+      "version": "1.1.1",
+      "name": "Try To Act Human",
+      "url": "https://forge.sp-tarkov.com/addon/26/try-to-act-human",
+      "updatedAt": "2026-01-08T08:50:00.000000Z",
+      "parentModId": 791
+    },
+    "a_24": {
+      "version": "1.0.1",
+      "name": "CrackedBots SAIN PRESET",
+      "url": "https://forge.sp-tarkov.com/addon/24/crackedbots-sain-preset",
+      "updatedAt": "2026-01-04T02:51:00.000000Z",
+      "parentModId": 791
+    },
+    "a_21": {
+      "version": "0.2.0",
+      "name": "anOrangeDoggo's SAIN Presets",
+      "url": "https://forge.sp-tarkov.com/addon/21/anorangedoggos-sain-presets",
+      "updatedAt": "2026-02-06T20:04:00.000000Z",
+      "parentModId": 791
+    },
+    "a_20": {
+      "version": "1.3.2",
+      "name": "Live Like Experience - SAIN Preset",
+      "url": "https://forge.sp-tarkov.com/addon/20/live-like-experience-sain-preset",
+      "updatedAt": "2026-01-03T01:12:00.000000Z",
+      "parentModId": 791
+    },
+    "a_1": {
+      "version": "2.3.0",
+      "name": "Quick-Sell",
+      "url": "https://forge.sp-tarkov.com/addon/1/quick-sell",
+      "updatedAt": "2026-02-02T18:03:00.000000Z",
+      "parentModId": 2299
+    }
+  }
+}
