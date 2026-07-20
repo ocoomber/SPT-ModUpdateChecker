@@ -1,0 +1,62 @@
+name: Check SPT Updates
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run checker
+        id: check
+        run: node scripts/check.js
+
+      - name: Read result
+        id: result
+        run: |
+          echo "changed=$(jq -r .changed result.json)" >> "$GITHUB_OUTPUT"
+          echo "mods_checked=$(jq -r .modsChecked result.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Build email body
+        if: steps.result.outputs.changed == 'true'
+        run: |
+          COUNT=$(jq '.changes | length' result.json)
+          {
+            echo "$COUNT update(s) detected across ${{ steps.result.outputs.mods_checked }} tracked mods"
+            echo ""
+            jq -r '.changes[] | "• \(.)"' result.json
+          } > email-body.txt
+          cat email-body.txt
+
+      - name: Send email
+        if: steps.result.outputs.changed == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: ${{ steps.result.outputs.mods_checked }} tracked mods — updates available
+          to: ${{ secrets.NOTIFY_EMAIL }}
+          from: SPT Update Checker
+          body_path: email-body.txt
+
+      - name: Commit updated state
+        if: steps.result.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state.json
+          git commit -m "Update stored versions"
+          git push
+
+      - name: Log no-change
+        if: steps.result.outputs.changed == 'false'
+        run: echo "No updates — everything is current"

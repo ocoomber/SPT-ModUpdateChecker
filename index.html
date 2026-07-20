@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPT Mod Update Checker</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzE2MWIyMiIgc3Ryb2tlPSIjMzAzNjNkIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxwYXRoIGQ9Ik0xMCAxOWE3IDcgMCAwIDEgMTEuOS00LjkiIHN0cm9rZT0iIzU4YTZmZiIgc3Ryb2tlLXdpZHRoPSIyLjUiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0yMiAxOXYtNWgtNSIgc3Ryb2tlPSIjNThhNmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117; color: #c9d1d9; padding: 1.5rem clamp(0.75rem, 4vw, 2rem); line-height: 1.5;
+}
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+h1 { color: #58a6ff; margin-bottom: 0.25rem; font-size: 1.75rem; }
+.subtitle { color: #8b949e; margin-bottom: 1.5rem; font-size: 0.9rem; }
+h2 { color: #58a6ff; font-size: 1.1rem; margin-bottom: 0.75rem; }
+
+.stats { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.stat {
+    background: #161b22; border: 1px solid #30363d;
+    border-radius: 6px; padding: 0.75rem 1.25rem; min-width: 120px;
+}
+.stat-value { font-size: 1.5rem; font-weight: 700; color: #f0f6fc; }
+.stat-label { font-size: 0.75rem; color: #8b949e; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-updated .stat-value { color: #d29922; }
+.stat-unconfirmed .stat-value { color: #8b949e; }
+.stat-ok .stat-value { color: #3fb950; }
+
+.panel {
+    background: #161b22; border: 1px solid #30363d;
+    border-radius: 6px; padding: 1.25rem; margin-bottom: 1.5rem;
+}
+.toolbar {
+    display: flex; gap: 0.75rem; align-items: center;
+    flex-wrap: wrap; margin-bottom: 0.75rem; justify-content: center;
+}
+.toolbar:last-child { margin-bottom: 0; }
+
+input[type="text"], input[type="search"] {
+    background: #0d1117; border: 1px solid #30363d;
+    border-radius: 6px; color: #c9d1d9;
+    padding: 0.5rem 1rem; font-size: 0.9rem; outline: none;
+}
+input:focus { border-color: #58a6ff; box-shadow: 0 0 0 3px rgba(88,166,255,0.15); }
+
+button {
+    background: #238636; border: 1px solid #2ea043;
+    border-radius: 6px; color: #fff; padding: 0.5rem 1rem;
+    font-size: 0.85rem; cursor: pointer; font-weight: 600;
+    white-space: nowrap;
+}
+button:not(:disabled):hover { background: #2ea043; }
+button:focus-visible { outline: 2px solid #58a6ff; outline-offset: 2px; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.btn-secondary { background: #21262d; border-color: #30363d; color: #c9d1d9; }
+button.btn-secondary:not(:disabled):hover { background: #30363d; }
+button.btn-confirm { background: transparent; border-color: #3fb950; color: #3fb950; }
+button.btn-confirm:not(:disabled):hover { background: rgba(63,185,80,0.15); }
+button.btn-danger { background: transparent; border-color: #f85149; color: #f85149; }
+button.btn-danger:not(:disabled):hover { background: rgba(248,81,73,0.15); }
+button.btn-small { padding: 0.25rem 0.6rem; font-size: 0.75rem; }
+
+.table-wrap { overflow-x: auto; border: 1px solid #30363d; border-radius: 6px; margin: 0 auto; width: fit-content; }
+table { border-collapse: separate; border-spacing: 0; }
+th {
+    background: #1c2128; padding: 0.75rem 1rem;
+    text-align: left; font-weight: 600; font-size: 0.8rem;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    color: #8b949e; border-bottom: 1px solid #30363d;
+    cursor: pointer; user-select: none;
+}
+th:first-child { border-radius: 5px 0 0 0; }
+th:last-child { border-radius: 0 5px 0 0; }
+th:hover { color: #c9d1d9; }
+td { padding: 0.6rem 1rem; border-bottom: 1px solid #21262d; font-size: 0.9rem; }
+tr:last-child td { border-bottom: none; }
+tr:hover { background: #1c2128; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.row-need { background: rgba(210,153,34,0.04); }
+.row-actions { white-space: nowrap; }
+
+.empty-state { text-align: center; padding: 3rem 1rem; color: #8b949e; }
+.empty-state p { margin-bottom: 0.5rem; }
+.spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid #30363d; border-top-color: #58a6ff;
+    border-radius: 50%; animation: spin 0.6s linear infinite;
+    vertical-align: middle; margin-right: 0.5rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast {
+    position: fixed; bottom: 2rem; right: 2rem;
+    background: #161b22; border: 1px solid #30363d;
+    border-radius: 6px; padding: 0.75rem 1.25rem;
+    font-size: 0.85rem; z-index: 100; animation: fadeIn 0.2s;
+}
+.toast-success { border-color: #3fb950; color: #3fb950; }
+.toast-error { border-color: #f85149; color: #f85149; }
+.toast-info { border-color: #58a6ff; color: #58a6ff; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } }
+
+.search-results {
+    max-height: 350px; overflow-y: auto; margin-top: 0.75rem;
+    border: 1px solid #30363d; border-radius: 6px;
+}
+.search-result {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.6rem 0.75rem; border-bottom: 1px solid #21262d; gap: 1rem;
+}
+.search-result:last-child { border-bottom: none; }
+.search-result:hover { background: #1c2128; }
+.search-result .mod-info { flex: 1; min-width: 0; }
+.search-result .mod-name { font-weight: 600; color: #f0f6fc; }
+.search-result .mod-meta { font-size: 0.8rem; color: #8b949e; }
+
+.search-status { padding: 1rem; text-align: center; }
+.search-status--empty { color: #8b949e; }
+.search-status--error { color: #f85149; }
+
+.hint { color: #8b949e; font-size: 0.8rem; }
+.addon-row { display: none; }
+.addon-row.open { display: table-row; }
+.addon-row td { padding: 0.4rem 1rem; font-size: 0.85rem; }
+.addon-row td:first-child { padding-left: 2.5rem; }
+.addon-row:hover { background: #1c2128; }
+.toggle-addons {
+    cursor: pointer; user-select: none; display: inline-block;
+    width: 1.2em; text-align: center; color: #8b949e; font-size: 0.8em;
+    transition: transform 0.15s;
+}
+.toggle-addons.open { transform: rotate(90deg); }
+.addon-header td {
+    padding: 0.3rem 1rem 0.3rem 2rem;
+    border-bottom: 1px solid #21262d;
+    color: #8b949e; font-size: 0.75rem; background: #161b22;
+}
+.addon-header { cursor: pointer; }
+.addon-header:focus-visible { outline: 2px solid #58a6ff; outline-offset: -2px; }
+tr.has-addons > td { border-bottom: none; padding-bottom: 0; }
+.addon-header:hover td { color: #c9d1d9; }
+tr.filtered-out { display: none !important; }
+#addModInput { max-width: 350px; width: 100%; }
+#filterTable { max-width: 250px; width: 100%; }
+.spt-panel { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.spt-label { font-weight: 700; color: #58a6ff; font-size: 0.9rem; }
+.spt-badge-new { color: #d29922; font-size: 0.85rem; font-weight: 600; }
+.spt-badge-ok { color: #3fb950; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<h1>SPT Mod Update Checker</h1>
+<p class="subtitle">Checks for updates on the SPT Forge &mdash; forge.sp-tarkov.com</p>
+
+<div class="stats">
+    <div class="stat"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Tracked Mods</div></div>
+    <div class="stat stat-updated"><div class="stat-value" id="statNeed">0</div><div class="stat-label">Need Update</div></div>
+    <div class="stat stat-unconfirmed"><div class="stat-value" id="statUnconfirmed">0</div><div class="stat-label">Not Confirmed</div></div>
+    <div class="stat stat-ok"><div class="stat-value" id="statOk">0</div><div class="stat-label">Up to Date</div></div>
+</div>
+<p class="subtitle" id="lastChecked">Last checked: Never</p>
+
+<div class="panel spt-panel">
+    <span class="spt-label">SPT</span>
+    <span>v<span id="sptUserVer">—</span></span>
+    <span style="color:#8b949e;">→</span>
+    <span id="sptLatestVer">Checking...</span>
+    <span class="spt-badge-new" id="sptBadgeNew" style="display:none;">Update available</span>
+    <span class="spt-badge-ok" id="sptBadgeOk" style="display:none;">Up to date ✓</span>
+    <button id="sptBtn" class="btn-confirm btn-small" style="display:none;">Set to latest</button>
+</div>
+
+<div class="panel">
+    <h2>Add a Mod</h2>
+    <div class="toolbar">
+        <label for="addModInput" class="sr-only">Mod URL or ID</label>
+        <input type="text" id="addModInput" placeholder="Paste a Forge URL or mod ID...">
+        <button onclick="addModFromInput()">Add</button>
+        <span class="hint">e.g. 2812 or https://forge.sp-tarkov.com/mod/2812/morequickslots</span>
+    </div>
+    <div class="toolbar">
+        <label for="searchForge" class="sr-only">Search mods</label>
+        <input type="search" id="searchForge" placeholder="Search mods on the Forge..." style="flex:1;">
+        <button class="btn-secondary" id="btnSearch" onclick="searchForge()">Search</button>
+    </div>
+    <div class="search-results" id="searchResults" style="display:none;"></div>
+</div>
+
+<div class="panel">
+    <div class="toolbar">
+        <h2 style="margin-bottom:0;">Tracked Mods</h2>
+    </div>
+    <div class="toolbar">
+        <label for="filterTable" class="sr-only">Filter table</label>
+        <input type="search" id="filterTable" placeholder="Filter table..." oninput="filterTable()">
+        <button onclick="checkAllUpdates()" id="btnCheck">Check for Updates</button>
+        <button class="btn-secondary" onclick="exportData()">Export</button>
+        <button class="btn-secondary" onclick="document.getElementById('importFile').click()">Import</button>
+        <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+    </div>
+    <div class="table-wrap">
+    <table id="modTable" style="display:none;">
+    <thead>
+    <tr>
+        <th onclick="sortTable(0)">Mod Name</th>
+        <th onclick="sortTable(1)">Version</th>
+        <th onclick="sortTable(2)">Latest Update</th>
+        <th onclick="sortTable(3)">Downloads</th>
+        <th onclick="sortTable(4)">Confirmed</th>
+        <th aria-label="Actions" style="cursor:default;"></th>
+    </tr>
+    </thead>
+    <tbody id="modTableBody"></tbody>
+    </table>
+    </div>
+    <div class="empty-state" id="emptyState">
+        <p>No mods tracked yet.</p>
+        <p>Paste a Forge URL or mod ID above, or search for a mod to get started.</p>
+    </div>
+</div>
+
+<script>
+const API = "https://forge.sp-tarkov.com/api/v0";
+const LS_KEY = "spt_mod_checker";
+const SPT_REPO = "sp-tarkov/build";
+
+let _sptLatest = null;
+
+async function checkSptRelease() {
+    try {
+        const resp = await fetch("https://api.github.com/repos/" + SPT_REPO + "/releases/latest", {
+            headers: { "Accept": "application/vnd.github+json" },
+        });
+        if (!resp.ok) throw new Error();
+        const data = await resp.json();
+        _sptLatest = { version: data.tag_name, url: data.html_url, name: data.name };
+    } catch(e) {
+        _sptLatest = null;
+    }
+    renderSptStatus();
+}
+
+function renderSptStatus() {
+    const userEl = document.getElementById("sptUserVer");
+    const latestEl = document.getElementById("sptLatestVer");
+    const badgeNew = document.getElementById("sptBadgeNew");
+    const badgeOk = document.getElementById("sptBadgeOk");
+    const btn = document.getElementById("sptBtn");
+
+    if (!_sptLatest) {
+        latestEl.textContent = "Check failed";
+        badgeNew.style.display = "none";
+        badgeOk.style.display = "none";
+        btn.style.display = "none";
+        return;
+    }
+
+    const latest = _sptLatest.version;
+    latestEl.innerHTML = 'v' + esc(latest) + ' <a href="' + attrEsc(safeUrl(_sptLatest.url)) + '" target="_blank" rel="noopener" style="font-size:0.8rem;color:#8b949e;">↗</a>';
+
+    const store = getStore();
+    const userVer = store.sptVersion;
+
+    if (!userVer) {
+        userEl.textContent = "—";
+        badgeNew.style.display = "none";
+        badgeOk.style.display = "none";
+        btn.style.display = "";
+        btn.textContent = "Set to v" + latest;
+        btn.onclick = function() { confirmSptVersion(latest); };
+    } else {
+        userEl.textContent = userVer;
+        if (compareVersions(latest, userVer) > 0) {
+            badgeNew.style.display = "";
+            badgeOk.style.display = "none";
+            btn.style.display = "";
+            btn.textContent = "Got this version";
+            btn.onclick = function() { confirmSptVersion(latest); };
+        } else {
+            badgeNew.style.display = "none";
+            badgeOk.style.display = "";
+            btn.style.display = "none";
+        }
+    }
+}
+
+function confirmSptVersion(version) {
+    const store = getStore();
+    store.sptVersion = version;
+    store.sptVersionConfirmedAt = new Date().toISOString();
+    saveStore(store);
+    renderSptStatus();
+    checkSptRelease();
+    toast("SPT v" + version + " confirmed", "success");
+}
+
+function compareVersions(a, b) {
+    const pa = a.split(".").map(Number);
+    const pb = b.split(".").map(Number);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+        const va = pa[i] || 0, vb = pb[i] || 0;
+        if (va > vb) return 1;
+        if (va < vb) return -1;
+    }
+    return 0;
+}
+
+function getStore() {
+    try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return { mods: [], lastChecked: null };
+}
+function saveStore(data) {
+    try {
+        localStorage.setItem(LS_KEY, JSON.stringify(data));
+    } catch(e) {
+        toast("Storage full — could not save changes", "error");
+    }
+}
+
+function toast(msg, type) {
+    const el = document.createElement("div");
+    el.className = "toast toast-" + (type || "info");
+    el.setAttribute("role", type === "error" ? "alert" : "status");
+    el.setAttribute("aria-live", type === "error" ? "assertive" : "polite");
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+}
+
+function extractModId(str) {
+    str = str.trim();
+    if (/^\d+$/.test(str)) return parseInt(str);
+    const m = str.match(/\/mod\/(\d+)/);
+    return m ? parseInt(m[1]) : null;
+}
+
+function esc(s) {
+    if (!s) return "";
+    const d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+}
+
+function attrEsc(s) {
+    if (!s) return "";
+    return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+}
+
+function safeUrl(s) {
+    if (!s) return "";
+    try {
+        const u = new URL(s, location.href);
+        if (u.protocol === "javascript:" || u.protocol === "data:") return "";
+        return s;
+    } catch(e) { return ""; }
+}
+
+function fmtDate(iso) {
+    if (!iso) return "-";
+    try {
+        const d = new Date(iso);
+        return String(d.getDate()).padStart(2,"0") + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + d.getFullYear();
+    } catch(e) { return "-"; }
+}
+
+function renderTable() {
+    const store = getStore();
+    const tbody = document.getElementById("modTableBody");
+    const empty = document.getElementById("emptyState");
+    const table = document.getElementById("modTable");
+
+    if (store.mods.length === 0) {
+        table.style.display = "none";
+        empty.style.display = "block";
+        updateStats(store);
+        return;
+    }
+    table.style.display = "table";
+    empty.style.display = "none";
+
+    const sorted = [...store.mods].sort((a, b) => {
+        const aa = a._isAddon ? 1 : 0;
+        const ba = b._isAddon ? 1 : 0;
+        if (aa !== ba) return aa - ba;
+        if (a.needsUpdate && !b.needsUpdate) return -1;
+        if (!a.needsUpdate && b.needsUpdate) return 1;
+        const da = a.latestUpdatedAt ? new Date(a.latestUpdatedAt).getTime() : 0;
+        const db = b.latestUpdatedAt ? new Date(b.latestUpdatedAt).getTime() : 0;
+        return db - da;
+    });
+
+    const parents = [];
+    const addonsById = {};
+    for (const m of sorted) {
+        if (m._isAddon) {
+            if (!addonsById[m._parentModId]) addonsById[m._parentModId] = [];
+            addonsById[m._parentModId].push(m);
+        } else {
+            parents.push(m);
+        }
+    }
+    const withAddons = [];
+    for (const m of parents) {
+        withAddons.push(m);
+        if (addonsById[m.id]) {
+            for (const a of addonsById[m.id]) withAddons.push(a);
+        }
+    }
+
+    let rows = "";
+    const collapsedKey = LS_KEY + "_collapsed";
+    let collapsed;
+    try { collapsed = JSON.parse(localStorage.getItem(collapsedKey)) || {}; } catch(e) { collapsed = {}; }
+    window._collapsedAddons = collapsed;
+    for (const m of withAddons) {
+        const ver = esc(m.latestVersion || "unknown");
+        const dl = m.downloads != null ? m.downloads.toLocaleString() : "-";
+        const url = m.url || "#";
+        const isAddon = m._isAddon;
+        const hasAddons = !isAddon && addonsById[m.id] && addonsById[m.id].length > 0;
+        const rowClass = (m.needsUpdate ? " row-need" : "") + (isAddon ? " addon-row" : "");
+        const openClass = isAddon ? (collapsed[m._parentModId] === false ? ' open' : '') : '';
+
+        let nameDisplay;
+        const href = attrEsc(safeUrl(url));
+        if (isAddon) {
+            nameDisplay = '<span style="color:#8b949e;">↳</span> <a href="' + href + '" target="_blank" rel="noopener">' + esc(m.name) + '</a>';
+        } else {
+            nameDisplay = '<a href="' + href + '" target="_blank" rel="noopener">' + esc(m.name) + '</a>';
+        }
+
+        const updated = fmtDate(m.latestUpdatedAt);
+        const btnClass = m.confirmedAt ? 'btn-confirm' : 'btn-secondary';
+        const btnHtml = '<button class="' + btnClass + ' btn-small" onclick="confirmHave(' + m.id + ')">I have this</button>';
+
+        const dataAttr = isAddon ? ' data-parent="' + m._parentModId + '"' : '';
+        const hasAddonsClass = hasAddons ? ' has-addons' : '';
+        const classes = (rowClass.trim() + openClass + hasAddonsClass).trim();
+        rows += '<tr' + (classes ? ' class="' + classes + '"' : '') + dataAttr + '>'
+            + '<td>' + nameDisplay + '</td>'
+            + '<td style="white-space:nowrap;">' + ver + '</td>'
+            + '<td style="white-space:nowrap;">' + updated + '</td>'
+            + '<td>' + dl + '</td>'
+            + '<td>' + fmtDate(m.confirmedAt) + '</td>'
+            + '<td class="row-actions">'
+            + btnHtml + ' '
+            + '<button class="btn-danger btn-small" aria-label="Remove ' + attrEsc(m.name) + '" onclick="removeMod(' + m.id + ')">X</button>'
+            + '</td>'
+            + '</tr>';
+
+        if (hasAddons) {
+            const count = addonsById[m.id].length;
+            const label = count + ' addon' + (count > 1 ? 's' : '');
+            const openCls = collapsed[m.id] === false ? ' open' : '';
+            rows += '<tr class="addon-header" tabindex="0" role="button" aria-expanded="' + (collapsed[m.id] === false) + '" data-addon-parent="' + m.id + '" onclick="toggleAddons(' + m.id + ')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();toggleAddons(' + m.id + ')}">'
+                + '<td colspan="6"><span class="toggle-addons' + openCls + '" id="chevron-' + m.id + '">&#9654;</span> ' + label + '</td>'
+                + '</tr>';
+        }
+    }
+    tbody.innerHTML = rows;
+    applySort();
+    updateStats(store);
+    const fv = document.getElementById("filterTable").value;
+    if (fv) doFilter();
+}
+
+function updateStats(store) {
+    let need = 0, ok = 0, unconfirmed = 0;
+    for (const m of store.mods) {
+        if (m._isAddon && !m.confirmedAt) continue;
+        if (!m.confirmedAt) { unconfirmed++; continue; }
+        if (m.needsUpdate) need++;
+        else ok++;
+    }
+    document.getElementById("statTotal").textContent = need + unconfirmed + ok;
+    document.getElementById("statNeed").textContent = need;
+    document.getElementById("statUnconfirmed").textContent = unconfirmed;
+    document.getElementById("statOk").textContent = ok;
+    document.getElementById("lastChecked").textContent = "Last checked: " + (store.lastChecked || "Never");
+}
+
+function toggleAddons(parentId) {
+    const collapsed = window._collapsedAddons;
+    const expanded = collapsed[parentId] === false;
+    collapsed[parentId] = expanded ? undefined : false;
+    try { localStorage.setItem(LS_KEY + "_collapsed", JSON.stringify(collapsed)); } catch(e) {}
+    renderTable();
+}
+
+function confirmHave(id) {
+    const store = getStore();
+    const m = store.mods.find(x => x.id === id);
+    if (!m) return;
+    m.confirmedAt = new Date().toISOString();
+    m.needsUpdate = false;
+    saveStore(store);
+    renderTable();
+    toast(m.name + " confirmed for v" + (m.latestVersion || "unknown"), "success");
+}
+
+function removeMod(id) {
+    const store = getStore();
+    const mod = store.mods.find(m => m.id === id);
+    store.mods = store.mods.filter(m => m.id !== id && m._parentModId !== id);
+    saveStore(store);
+    renderTable();
+    if (mod) toast("Removed " + mod.name, "success");
+}
+
+async function addModFromInput() {
+    const input = document.getElementById("addModInput");
+    const val = input.value.trim();
+    if (!val) return;
+    const id = extractModId(val);
+    if (!id) { toast("Could not parse a mod ID from that input", "error"); return; }
+    await addModById(id);
+    input.value = "";
+}
+
+async function addModById(id) {
+    const store = getStore();
+    if (store.mods.some(m => m.id === id)) {
+        toast("Already tracking that mod", "error");
+        return false;
+    }
+    try {
+        const resp = await fetch(API + "/mod/" + id + "?include=versions");
+        const data = await resp.json();
+        if (!data.success) throw new Error("API error");
+        const mod = data.data;
+        const versions = mod.versions || [];
+        store.mods.push({
+            id: id,
+            name: mod.name,
+            latestVersion: versions[0] ? versions[0].version : "unknown",
+            latestUpdatedAt: (versions[0] && versions[0].published_at) || mod.updated_at || null,
+            added: new Date().toISOString().slice(0, 10),
+            url: mod.detail_url || ("https://forge.sp-tarkov.com/mod/" + id),
+            downloads: mod.downloads || 0,
+            confirmedAt: null,
+            needsUpdate: false,
+        });
+        saveStore(store);
+        renderTable();
+        toast("Added: " + mod.name + " — click 'I have this' when installed", "success");
+        return true;
+    } catch(e) {
+        toast("Failed to fetch mod data. Check the ID.", "error");
+        return false;
+    }
+}
+
+async function searchForge() {
+    const q = document.getElementById("searchForge").value.trim();
+    if (!q) return;
+    const container = document.getElementById("searchResults");
+    const btn = document.getElementById("btnSearch");
+    container.style.display = "block";
+    container.innerHTML = '<div class="search-status"><span class="spinner"></span> Searching...</div>';
+    btn.disabled = true;
+    try {
+        const isUrl = /\/mod\/\d+/.test(q);
+        let results = [];
+        if (isUrl) {
+            const id = extractModId(q);
+            const resp = await fetch(API + "/mod/" + id);
+            const data = await resp.json();
+            if (data.success) results = [data.data];
+        } else {
+            const resp = await fetch(API + "/mods?query=" + encodeURIComponent(q) + "&per_page=10");
+            const data = await resp.json();
+            if (data.success) results = data.data;
+        }
+        if (results.length === 0) {
+            container.innerHTML = '<div class="search-status search-status--empty">No results found.</div>';
+            return;
+        }
+        const store = getStore();
+        let html = "";
+        for (const mod of results) {
+            const tracked = store.mods.some(m => m.id === mod.id);
+            const versions = mod.versions || [];
+            const ver = versions.length > 0 ? "v" + esc(versions[0].version) : "";
+            const dl = mod.downloads ? mod.downloads.toLocaleString() + " downloads" : "";
+            const fika = mod.fika_compatibility ? "Fika compatible" : "";
+            const meta = [ver, dl, fika].filter(Boolean).join(" · ");
+            html += '<div class="search-result">'
+                + '<div class="mod-info">'
+                + '<div class="mod-name">' + esc(mod.name) + '</div>'
+                + '<div class="mod-meta">' + meta + '</div>'
+                + '</div>'
+                + (tracked
+                    ? '<button class="btn-secondary" disabled>Tracked</button>'
+                    : '<button data-mod-id="' + mod.id + '" onclick="addModFromSearch(' + mod.id + ')">Add</button>')
+                + '</div>';
+        }
+        container.innerHTML = html;
+    } catch(e) {
+        container.innerHTML = '<div class="search-status search-status--error">Search failed. Check your connection.</div>';
+    }
+    btn.disabled = false;
+}
+
+async function addModFromSearch(id) {
+    const success = await addModById(id);
+    if (success) {
+        const btn = document.querySelector('.search-result button[data-mod-id="' + id + '"]');
+        if (btn) btn.outerHTML = '<button class="btn-secondary" disabled>Tracked</button>';
+    }
+}
+
+async function checkAllUpdates() {
+    const store = getStore();
+    if (store.mods.length === 0) { toast("No mods to check", "error"); return; }
+    const btn = document.getElementById("btnCheck");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Checking...';
+
+    const mods = store.mods.filter(m => !m._isAddon);
+    const updates = {};
+    const newAddons = [];
+    let failures = 0;
+
+    async function fetchMod(m) {
+        try {
+            const resp = await fetch(API + "/mod/" + m.id + "?include=versions");
+            const data = await resp.json();
+            if (!data.success) throw new Error();
+            const remote = data.data;
+            const versions = remote.versions || [];
+            const latestVersion = versions.length > 0 ? versions[0].version : m.latestVersion;
+            const latestDate = versions.length > 0 ? versions[0].published_at : m.latestUpdatedAt;
+
+            updates[m.id] = {
+                latestVersion, latestUpdatedAt: latestDate,
+                name: remote.name || m.name, url: remote.detail_url || m.url,
+                downloads: remote.downloads || m.downloads,
+            };
+        } catch(e) { failures++; }
+
+        try {
+            const aResp = await fetch(API + "/addons?filter[mod_id]=" + m.id + "&include=versions&per_page=50");
+            const aData = await aResp.json();
+            if (aData.success && aData.data) {
+                for (const addon of aData.data) {
+                    const aVersions = addon.versions || [];
+                    const aVer = aVersions.length > 0 ? aVersions[0].version : "unknown";
+                    const aDate = aVersions.length > 0 ? aVersions[0].published_at : null;
+
+                    if (!updates["a_" + addon.id]) updates["a_" + addon.id] = {};
+                    Object.assign(updates["a_" + addon.id], {
+                        latestVersion: aVer, latestUpdatedAt: aDate,
+                        name: addon.name, url: addon.detail_url || "#",
+                        downloads: addon.downloads || 0,
+                    });
+
+                    if (!store.mods.some(x => x._isAddon && x.id === addon.id)) {
+                        newAddons.push({
+                            id: addon.id, name: addon.name,
+                            latestVersion: aVer, latestUpdatedAt: aDate,
+                            added: new Date().toISOString().slice(0, 10),
+                            url: addon.detail_url || "#", downloads: addon.downloads || 0,
+                            confirmedAt: null, needsUpdate: false,
+                            _isAddon: true, _parentModId: m.id, _parentModName: m.name,
+                        });
+                    }
+                }
+            }
+        } catch(e) { failures++; }
+    }
+
+    const BATCH = 5;
+    for (let i = 0; i < mods.length; i += BATCH) {
+        await Promise.allSettled(mods.slice(i, i + BATCH).map(fetchMod));
+    }
+
+    const fresh = getStore();
+    for (const m of fresh.mods) {
+        const u = m._isAddon ? updates["a_" + m.id] : updates[m.id];
+        if (u) {
+            m.latestVersion = u.latestVersion;
+            m.latestUpdatedAt = u.latestUpdatedAt;
+            m.name = u.name;
+            m.url = u.url;
+            m.downloads = u.downloads;
+            if (m.confirmedAt && u.latestUpdatedAt && new Date(m.confirmedAt) < new Date(u.latestUpdatedAt)) {
+                m.needsUpdate = true;
+            } else if (m.confirmedAt) {
+                m.needsUpdate = false;
+            }
+        }
+    }
+    for (const a of newAddons) {
+        if (!fresh.mods.some(x => x._isAddon && x.id === a.id)) fresh.mods.push(a);
+    }
+
+    const now = new Date();
+    fresh.lastChecked = now.toLocaleString();
+    saveStore(fresh);
+    renderTable();
+    btn.disabled = false;
+    btn.textContent = "Check for Updates";
+    const tracked = fresh.mods.filter(m => !m._isAddon);
+    const realNeed = tracked.filter(m => m.needsUpdate || !m.confirmedAt).length;
+    let msg = "Done. " + realNeed + " mod(s) need attention.";
+    if (failures > 0) msg += " (" + failures + " request(s) failed)";
+    toast(msg, realNeed > 0 ? "info" : "success");
+}
+
+let _filterTimer = null;
+function filterTable() {
+    clearTimeout(_filterTimer);
+    _filterTimer = setTimeout(() => doFilter(), 150);
+}
+function doFilter() {
+    const q = document.getElementById("filterTable").value.toLowerCase();
+    document.querySelectorAll("#modTableBody tr").forEach(r => {
+        r.classList.toggle("filtered-out", q.length > 0 && !r.textContent.toLowerCase().includes(q));
+    });
+}
+
+let _activeSort = null;
+function sortTable(col) {
+    if (_activeSort && _activeSort.col === col) {
+        _activeSort.dir = !_activeSort.dir;
+    } else {
+        _activeSort = { col, dir: true };
+    }
+    applySort();
+}
+
+function applySort() {
+    if (!_activeSort) return;
+    const tbody = document.getElementById("modTableBody");
+    if (!tbody) return;
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    const { col, dir } = _activeSort;
+
+    const groups = [];
+    let current = [];
+    for (const r of rows) {
+        if (r.classList.contains("addon-header") || r.classList.contains("addon-row")) {
+            current.push(r);
+        } else {
+            if (current.length) groups.push(current);
+            current = [r];
+        }
+    }
+    if (current.length) groups.push(current);
+
+    groups.sort((a, b) => {
+        const ar = a[0], br = b[0];
+        if (!ar.children[col] || !br.children[col]) return 0;
+        let av = ar.children[col].textContent.trim();
+        let bv = br.children[col].textContent.trim();
+        let an = parseFloat(av.replace(/,/g, ""));
+        let bn = parseFloat(bv.replace(/,/g, ""));
+        if (!isNaN(an) && !isNaN(bn)) return dir ? an - bn : bn - an;
+        return dir ? av.localeCompare(bv) : bv.localeCompare(av);
+    });
+
+    for (const g of groups) for (const r of g) tbody.appendChild(r);
+
+    document.querySelectorAll("#modTable thead th").forEach((th, i) => {
+        if (i === col) th.textContent = th.textContent.replace(/ *[▲▼]$/, "") + (dir ? " ▲" : " ▼");
+        else th.textContent = th.textContent.replace(/ *[▲▼]$/, "");
+    });
+}
+
+function exportData() {
+    const blob = new Blob([JSON.stringify(getStore(), null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    const blobUrl = URL.createObjectURL(blob);
+    a.href = blobUrl;
+    a.download = "spt-mods-backup.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+    toast("Exported mod list", "success");
+}
+
+const MOD_FIELDS = new Set(["id","name","latestVersion","latestUpdatedAt","added","url","downloads","confirmedAt","needsUpdate","_isAddon","_parentModId","_parentModName"]);
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.mods && Array.isArray(data.mods)) {
+                const store = getStore();
+                const ids = new Set(store.mods.map(m => m.id));
+                let added = 0;
+                for (const raw of data.mods) {
+                    if (added >= 100) { toast("Import capped at 100 mods", "info"); break; }
+                    if (typeof raw.id !== "number" || ids.has(raw.id)) continue;
+                    const m = {};
+                    for (const k of Object.keys(raw)) {
+                        if (MOD_FIELDS.has(k)) m[k] = raw[k];
+                    }
+                    if (m._isAddon && !m._parentModId) continue;
+                    if (m._isAddon && typeof m._parentModId !== "number") continue;
+                    m.id = raw.id;
+                    m.name = String(m.name || "Unknown").slice(0, 200);
+                    m.url = String(m.url || "").slice(0, 500);
+                    m.confirmedAt = m.confirmedAt || null;
+                    m.needsUpdate = !!m.needsUpdate;
+                    m.downloads = typeof m.downloads === "number" ? m.downloads : 0;
+                    store.mods.push(m);
+                    ids.add(m.id);
+                    added++;
+                }
+                saveStore(store);
+                renderTable();
+                checkAllUpdates();
+                toast("Imported " + added + " new mods", "success");
+            } else { toast("Invalid backup file", "error"); }
+        } catch(err) { toast("Failed to parse file", "error"); }
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+}
+
+document.getElementById("searchForge").addEventListener("keydown", e => { if (e.key === "Enter") searchForge(); });
+document.getElementById("addModInput").addEventListener("keydown", e => { if (e.key === "Enter") addModFromInput(); });
+
+renderTable();
+if (getStore().mods.length > 0) setTimeout(checkAllUpdates, 500);
+checkSptRelease();
+</script>
+</body>
+</html>
