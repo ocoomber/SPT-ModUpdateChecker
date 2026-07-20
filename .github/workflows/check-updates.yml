@@ -50,15 +50,20 @@ jobs:
           from: SPT Update Checker
           body_path: email-body.txt
 
-      - name: Commit updated state
-        if: steps.result.outputs.changed == 'true'
+      - name: Persist state
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state.json
-          git commit -m "Update stored versions"
-          git push
+          git diff --cached --quiet && echo "State unchanged" || (
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Update stored versions"
+            git push
+          )
 
-      - name: Log no-change
-        if: steps.result.outputs.changed == 'false'
-        run: echo "No updates — everything is current"
+      - name: Log status
+        run: |
+          if [ "${{ steps.result.outputs.changed }}" == "true" ]; then
+            echo "Updates detected — email sent"
+          else
+            echo "No updates — everything is current"
+          fi
