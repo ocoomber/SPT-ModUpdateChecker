@@ -38,8 +38,7 @@ jobs:
             --title "$COUNT update(s) available" \
             --body "Updates detected across ${{ steps.result.outputs.mods_checked }} tracked mods:
 
-          $BODY" \
-            --label "automated"
+          $BODY"
 
       - name: Persist state
         run: |
