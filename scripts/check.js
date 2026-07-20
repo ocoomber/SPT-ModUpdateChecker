@@ -1,5 +1,6 @@
 const fs = require("fs");
 const https = require("https");
+const execSync = require("child_process").execSync;
 
 const FORGE_API = "https://forge.sp-tarkov.com/api/v0";
 const SPT_REPO = "sp-tarkov/build";
@@ -41,16 +42,12 @@ function compareVersions(a, b) {
   return 0;
 }
 
-async function checkSpt(state) {
+function checkSpt(state) {
   try {
-    const token = process.env.GITHUB_TOKEN;
-    const headers = { Accept: "application/vnd.github+json" };
-    if (token) headers.Authorization = "Bearer " + token;
-    const data = await fetchWithHeaders(
-      `https://api.github.com/repos/${SPT_REPO}/releases/latest`,
-      headers
-    );
-    const ver = data.tag_name;
+    const ver = execSync(
+      `gh api repos/sp-tarkov/build/releases/latest --jq .tag_name`,
+      { encoding: "utf8", timeout: 10000 }
+    ).trim();
     const old = state.sptVersion;
     if (old && compareVersions(ver, old) > 0) {
       state._changes.push(`SPT: ${old} -> ${ver}`);
@@ -124,7 +121,7 @@ async function main() {
   const state = loadJson("state.json") || { sptVersion: null, mods: {} };
   state._changes = [];
 
-  await checkSpt(state);
+  checkSpt(state);
 
   const BATCH = 5;
   for (let i = 0; i < parentMods.length; i += BATCH) {
