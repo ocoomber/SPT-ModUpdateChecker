@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   check:
@@ -26,29 +27,17 @@ jobs:
           echo "changed=$(jq -r .changed result.json)" >> "$GITHUB_OUTPUT"
           echo "mods_checked=$(jq -r .modsChecked result.json)" >> "$GITHUB_OUTPUT"
 
-      - name: Build email body
+      - name: Create issue
         if: steps.result.outputs.changed == 'true'
         run: |
           COUNT=$(jq '.changes | length' result.json)
-          {
-            echo "$COUNT update(s) detected across ${{ steps.result.outputs.mods_checked }} tracked mods"
-            echo ""
-            jq -r '.changes[] | "• \(.)"' result.json
-          } > email-body.txt
-          cat email-body.txt
+          BODY=$(jq -r '.changes[] | "• \(.)"' result.json)
+          gh issue create \
+            --title "$COUNT update(s) available" \
+            --body "Updates detected across ${{ steps.result.outputs.mods_checked }} tracked mods:
 
-      - name: Send email
-        if: steps.result.outputs.changed == 'true'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: ${{ steps.result.outputs.mods_checked }} tracked mods — updates available
-          to: ${{ secrets.NOTIFY_EMAIL }}
-          from: SPT Update Checker
-          body_path: email-body.txt
+          $BODY" \
+            --label "automated"
 
       - name: Persist state
         run: |
@@ -63,7 +52,7 @@ jobs:
       - name: Log status
         run: |
           if [ "${{ steps.result.outputs.changed }}" == "true" ]; then
-            echo "Updates detected — email sent"
+            echo "Updates detected — issue created"
           else
             echo "No updates — everything is current"
           fi
