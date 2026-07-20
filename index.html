@@ -779,7 +779,7 @@ function exportData() {
     const a = document.createElement("a");
     const blobUrl = URL.createObjectURL(blob);
     a.href = blobUrl;
-    a.download = "spt-mods-backup.json";
+    a.download = "mods.json";
     a.click();
     setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
     toast("Exported mod list", "success");
