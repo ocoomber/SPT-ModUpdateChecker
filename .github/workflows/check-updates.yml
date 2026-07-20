@@ -16,6 +16,8 @@ jobs:
 
       - name: Run checker
         id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/check.js
 
       - name: Read result

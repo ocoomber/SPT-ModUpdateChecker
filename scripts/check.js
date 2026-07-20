@@ -5,8 +5,12 @@ const FORGE_API = "https://forge.sp-tarkov.com/api/v0";
 const SPT_REPO = "sp-tarkov/build";
 
 function fetch(url) {
+  return fetchWithHeaders(url, { Accept: "application/json" });
+}
+
+function fetchWithHeaders(url, headers) {
   return new Promise((resolve, reject) => {
-    https.get(url, { headers: { Accept: "application/json" } }, (res) => {
+    https.get(url, { headers }, (res) => {
       let data = "";
       res.on("data", (c) => (data += c));
       res.on("end", () => {
@@ -39,8 +43,12 @@ function compareVersions(a, b) {
 
 async function checkSpt(state) {
   try {
-    const data = await fetch(
-      `https://api.github.com/repos/${SPT_REPO}/releases/latest`
+    const token = process.env.GITHUB_TOKEN;
+    const headers = { Accept: "application/vnd.github+json" };
+    if (token) headers.Authorization = "Bearer " + token;
+    const data = await fetchWithHeaders(
+      `https://api.github.com/repos/${SPT_REPO}/releases/latest`,
+      headers
     );
     const ver = data.tag_name;
     const old = state.sptVersion;
